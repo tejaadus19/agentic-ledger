@@ -3,7 +3,7 @@ resource "google_pubsub_topic" "settlement_events" {
   name = "settlement-events"
   labels = {
     environment = var.environment
-    service     = "trust-agent"
+    service     = "agentic-ledger"
     use_case    = "reconciliation"
   }
   message_retention_duration = "86400s"
@@ -14,7 +14,7 @@ resource "google_pubsub_topic" "corporate_actions" {
   name = "corporate-actions"
   labels = {
     environment = var.environment
-    service     = "trust-agent"
+    service     = "agentic-ledger"
     use_case    = "corporate-actions"
   }
   message_retention_duration = "86400s"
@@ -49,7 +49,7 @@ resource "google_bigquery_dataset" "audit_logs" {
 
   labels = {
     environment = var.environment
-    service     = "trust-agent"
+    service     = "agentic-ledger"
   }
 }
 

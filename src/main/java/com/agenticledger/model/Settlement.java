@@ -1,4 +1,4 @@
-package com.deutschebank.model;
+package com.agenticledger.model;
 
 import com.google.gson.annotations.SerializedName;
 import java.time.LocalDateTime;

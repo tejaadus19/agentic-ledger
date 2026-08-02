@@ -5,13 +5,13 @@
                              http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.deutschebank</groupId>
-    <artifactId>trust-agent-service</artifactId>
+    <groupId>com.agenticledger</groupId>
+    <artifactId>agentic-ledger</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
 
-    <name>Trust Agent Service</name>
-    <description>Banking AI Agents Platform</description>
+    <name>Agentic Ledger</name>
+    <description>Multi-Agent AI System for Financial Reconciliation and Processing</description>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>

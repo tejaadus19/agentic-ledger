@@ -1,4 +1,4 @@
-package com.deutschebank.core;
+package com.agenticledger.core;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,12 +8,12 @@ public class Application {
 
     public static void main(String[] args) {
         logger.info("═══════════════════════════════════════════════════════");
-        logger.info("Starting Trust Agent Service...");
+        logger.info("Starting Agentic Ledger...");
         logger.info("Version: 1.0.0");
         logger.info("Environment: {}", System.getenv("APP_ENV") != null ? System.getenv("APP_ENV") : "development");
         logger.info("═══════════════════════════════════════════════════════");
 
-        logger.info("✅ Trust Agent Service initialized successfully");
+        logger.info("✅ Agentic Ledger initialized successfully");
         logger.info("");
         logger.info("Ready for:");
         logger.info("  • Real-time transaction reconciliation");
