@@ -1,0 +1,69 @@
+name: Build and Test
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        java-version: ['21']
+
+    steps:
+      # Step 1: Checkout code from repository
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Step 2: Set up Java environment
+      - name: Set up Java ${{ matrix.java-version }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ matrix.java-version }}
+          distribution: 'temurin'
+          cache: maven
+
+      # Step 3: Validate Maven configuration
+      - name: Validate Maven configuration
+        run: mvn validate
+
+      # Step 4: Compile code
+      - name: Compile code
+        run: mvn clean compile
+
+      # Step 5: Run unit tests
+      - name: Run unit tests
+        run: mvn test
+
+      # Step 6: Build JAR package
+      - name: Build package
+        run: mvn clean package -DskipTests
+
+      # Step 7: Upload build artifacts
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        if: success()
+        with:
+          name: agentic-ledger-jar
+          path: target/*.jar
+          retention-days: 30
+
+  # Optional: Code quality check
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Check code style
+        run: mvn validate
