@@ -2,6 +2,7 @@ package com.agenticledger.agents.reconciliation;
 
 import com.google.cloud.firestore.Firestore;
 import com.agenticledger.agents.mcp.SettlementDatabaseMCP;
+import com.agenticledger.agents.prompts.PromptLibrary;
 import com.agenticledger.model.Settlement;
 import com.agenticledger.model.Account;
 import dev.langchain4j.model.chat.ChatLanguageModel;
@@ -69,34 +70,7 @@ public class MatcherAgent {
      * Role 1: Matcher Agent - Analyzes if settlement matches account position
      */
     private String analyzeAsMatchMaker(Settlement settlement, Account account) {
-        String prompt = String.format(
-            "You are a Matcher Agent analyzing a settlement reconciliation.\n\n" +
-            "Settlement Details:\n" +
-            "- ID: %s\n" +
-            "- Security: %s\n" +
-            "- Quantity: %f\n" +
-            "- Amount: $%f\n" +
-            "- Currency: %s\n\n" +
-            "Account Details:\n" +
-            "- ID: %s\n" +
-            "- Name: %s\n" +
-            "- Current Balance: $%f\n" +
-            "- Status: %s\n\n" +
-            "Question: Does this settlement MATCH the account position?\n" +
-            "Provide analysis: Is the amount and security correct?\n" +
-            "Answer with MATCH or MISMATCH and explain briefly.",
-
-            settlement.getSettlementId(),
-            settlement.getSecurity(),
-            settlement.getQuantity(),
-            settlement.getAmount(),
-            settlement.getCurrency(),
-            account.getAccountId(),
-            account.getAccountName(),
-            account.getBalance(),
-            account.getStatus()
-        );
-
+        String prompt = PromptLibrary.getMatcherPrompt(settlement, account);
         return model.generate(prompt);
     }
 
@@ -104,26 +78,7 @@ public class MatcherAgent {
      * Role 2: Devil's Advocate - Challenges the matcher's analysis
      */
     private String analyzeAsDevilsAdvocate(Settlement settlement, Account account, String matcherAnalysis) {
-        String prompt = String.format(
-            "You are a Devil's Advocate Agent reviewing a settlement analysis.\n\n" +
-            "Settlement: %s for $%f of %s\n" +
-            "Account Balance: $%f\n\n" +
-            "Matcher Agent's Analysis:\n%s\n\n" +
-            "Your role: Challenge this analysis!\n" +
-            "Ask critical questions:\n" +
-            "- What if there's a duplicate settlement?\n" +
-            "- What if the account is restricted?\n" +
-            "- What if there's a timing issue?\n" +
-            "- What edge cases might be missed?\n\n" +
-            "Provide counter-arguments and risks.",
-
-            settlement.getSettlementId(),
-            settlement.getAmount(),
-            settlement.getSecurity(),
-            account.getBalance(),
-            matcherAnalysis
-        );
-
+        String prompt = PromptLibrary.getDevilsAdvocatePrompt(settlement, account, matcherAnalysis);
         return model.generate(prompt);
     }
 
@@ -136,26 +91,9 @@ public class MatcherAgent {
         String matcherAnalysis,
         String devilsAdvocateAnalysis) {
 
-        String arbitratorPrompt = String.format(
-            "You are an Arbitrator Agent making the final decision on a settlement.\n\n" +
-            "Settlement: %s, Amount: $%f\n" +
-            "Account: %s, Balance: $%f\n\n" +
-            "Matcher Agent says:\n%s\n\n" +
-            "Devil's Advocate says:\n%s\n\n" +
-            "Based on both perspectives, make a FINAL DECISION.\n" +
-            "Respond in this format:\n" +
-            "DECISION: [APPROVE or REJECT]\n" +
-            "CONFIDENCE: [0.0 to 1.0]\n" +
-            "REASONING: [one sentence]",
-
-            settlement.getSettlementId(),
-            settlement.getAmount(),
-            account.getAccountId(),
-            account.getBalance(),
-            matcherAnalysis,
-            devilsAdvocateAnalysis
+        String arbitratorPrompt = PromptLibrary.getMatcherArbiterPrompt(
+            settlement, account, matcherAnalysis, devilsAdvocateAnalysis
         );
-
         String decision = model.generate(arbitratorPrompt);
 
         // Parse the response
